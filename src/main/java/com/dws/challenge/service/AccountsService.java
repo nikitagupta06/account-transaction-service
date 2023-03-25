@@ -1,8 +1,7 @@
 package com.dws.challenge.service;
 
 import com.dws.challenge.domain.Account;
-import com.dws.challenge.exception.InsufficientBalanceException;
-import com.dws.challenge.exception.NegativeAmountException;
+import com.dws.challenge.exception.TransactionFailedException;
 import com.dws.challenge.repository.AccountsRepository;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ public class AccountsService {
     return this.accountsRepository.getAccount(accountId);
   }
 
-  public void transfer(String fromId, String toId, BigDecimal amount) throws NegativeAmountException, InsufficientBalanceException {
+  public void transfer(String fromId, String toId, BigDecimal amount) throws TransactionFailedException {
     this.accountsRepository.transfer(fromId, toId, amount);
   }
 

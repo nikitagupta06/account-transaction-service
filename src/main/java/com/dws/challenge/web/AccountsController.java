@@ -3,8 +3,7 @@ package com.dws.challenge.web;
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.domain.Transaction;
 import com.dws.challenge.exception.DuplicateAccountIdException;
-import com.dws.challenge.exception.InsufficientBalanceException;
-import com.dws.challenge.exception.NegativeAmountException;
+import com.dws.challenge.exception.TransactionFailedException;
 import com.dws.challenge.service.AccountsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,12 +49,9 @@ public class AccountsController {
   public ResponseEntity<Object> transfer(@RequestBody Transaction transaction) {
 
     try {
-      this.accountsService.transfer(transaction.getFromAccountId(), transaction.getFromAccountId(),
-              transaction.getAmount());
-    } catch (InsufficientBalanceException ibe) {
-      return new ResponseEntity<>(ibe.getMessage(), HttpStatus.BAD_REQUEST);
-    } catch (NegativeAmountException nae) {
-      return new ResponseEntity<>(nae.getMessage(), HttpStatus.BAD_REQUEST);
+      this.accountsService.transfer(transaction.getFromAccountId(), transaction.getFromAccountId(), transaction.getAmount());
+    } catch (TransactionFailedException transactionFailedException) {
+      return new ResponseEntity<>(transactionFailedException.getMessage(), HttpStatus.BAD_REQUEST);
     }
     return new ResponseEntity<>(HttpStatus.ACCEPTED);
   }

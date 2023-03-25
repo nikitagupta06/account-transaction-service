@@ -1,15 +1,13 @@
 package com.dws.challenge;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.from;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.math.BigDecimal;
 
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.exception.DuplicateAccountIdException;
-import com.dws.challenge.exception.InsufficientBalanceException;
-import com.dws.challenge.exception.NegativeAmountException;
+import com.dws.challenge.exception.TransactionFailedException;
 import com.dws.challenge.service.AccountsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +46,7 @@ class AccountsServiceTest {
   }
 
   @Test
-  void transferFailed_negativeAmount() {
+  void TransactionFailed_negativeAmount() {
     Account fromAccount = new Account("123");
     fromAccount.setBalance(new BigDecimal(1000));
     Account toAccount = new Account("124");
@@ -57,16 +55,13 @@ class AccountsServiceTest {
 
     try {
       this.accountsService.transfer(fromAccount.getAccountId(), toAccount.getAccountId(), amount);
-    } catch (NegativeAmountException ex) {
+    } catch (TransactionFailedException ex) {
       assertThat(ex.getMessage()).isEqualTo("Amount can not be negative!");
-    } catch (InsufficientBalanceException ex) {
-      assertThat(ex.getMessage()).isEqualTo("Account id " + fromAccount.getAccountId() +
-              " has low Balance");
     }
 
   }
   @Test
-  void transferFailed_insufficientBalance() {
+  void transactionFailedException_insufficientBalance() {
     Account fromAccount = new Account("123");
     fromAccount.setBalance(new BigDecimal(1000));
     Account toAccount = new Account("124");
@@ -75,11 +70,9 @@ class AccountsServiceTest {
 
     try {
       this.accountsService.transfer(fromAccount.getAccountId(), toAccount.getAccountId(), amount);
-    } catch (InsufficientBalanceException ex) {
+    } catch (TransactionFailedException ex) {
       assertThat(ex.getMessage()).isEqualTo("Account id " + fromAccount.getAccountId() +
               " has low Balance");
-    } catch (NegativeAmountException ex) {
-      assertThat(ex.getMessage()).isEqualTo("Amount can not be negative!");
     }
 
   }

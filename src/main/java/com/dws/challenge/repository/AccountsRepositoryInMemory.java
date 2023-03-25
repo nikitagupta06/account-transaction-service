@@ -2,8 +2,7 @@ package com.dws.challenge.repository;
 
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.exception.DuplicateAccountIdException;
-import com.dws.challenge.exception.InsufficientBalanceException;
-import com.dws.challenge.exception.NegativeAmountException;
+import com.dws.challenge.exception.TransactionFailedException;
 import com.dws.challenge.service.EmailNotificationService;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class AccountsRepositoryInMemory extends Thread implements AccountsRepository {
+public class AccountsRepositoryInMemory implements AccountsRepository {
 
     private final Map<String, Account> accounts = new ConcurrentHashMap<>();
 
@@ -43,16 +42,16 @@ public class AccountsRepositoryInMemory extends Thread implements AccountsReposi
 
     @Override
     public void transfer(String accountIdFrom, String accountIdTo, BigDecimal amount)
-            throws InsufficientBalanceException, NegativeAmountException {
+            throws TransactionFailedException {
 
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new NegativeAmountException("Amount can not be negative!");
+            throw new TransactionFailedException("Amount can not be negative!");
         }
         Account fromAccount = accounts.get(accountIdFrom);
         Account toAccount = accounts.get(accountIdTo);
 
         if (amount.compareTo(fromAccount.getBalance()) == 1) {
-            throw new InsufficientBalanceException("Account id " + accountIdFrom +
+            throw new TransactionFailedException("Account id " + accountIdFrom +
                     " has low Balance");
         }
 
