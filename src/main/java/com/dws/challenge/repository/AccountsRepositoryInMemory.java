@@ -49,7 +49,7 @@ public class AccountsRepositoryInMemory extends Thread implements AccountsReposi
             throw new NegativeAmountException("Amount can not be negative!");
         }
         Account fromAccount = accounts.get(accountIdFrom);
-        Account toAccount = accounts.get(accountIdFrom);
+        Account toAccount = accounts.get(accountIdTo);
 
         if (amount.compareTo(fromAccount.getBalance()) == 1) {
             throw new InsufficientBalanceException("Account id " + accountIdFrom +

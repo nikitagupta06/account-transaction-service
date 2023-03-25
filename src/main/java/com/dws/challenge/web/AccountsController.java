@@ -49,8 +49,6 @@ public class AccountsController {
   @PostMapping(path = "/transfer", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Object> transfer(@RequestBody Transaction transaction) {
 
-    System.out.println(transaction.getFromAccountId());
-
     try {
       this.accountsService.transfer(transaction.getFromAccountId(), transaction.getFromAccountId(),
               transaction.getAmount());
