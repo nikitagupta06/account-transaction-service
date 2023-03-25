@@ -1,6 +1,7 @@
 package com.dws.challenge.service;
 
 import com.dws.challenge.domain.Account;
+import com.dws.challenge.domain.Transaction;
 import com.dws.challenge.exception.TransactionFailedException;
 import com.dws.challenge.repository.AccountsRepository;
 import lombok.Getter;
@@ -28,8 +29,8 @@ public class AccountsService {
     return this.accountsRepository.getAccount(accountId);
   }
 
-  public void transfer(String fromId, String toId, BigDecimal amount) throws TransactionFailedException {
-    this.accountsRepository.transfer(fromId, toId, amount);
+  public void transfer(Transaction transaction) throws TransactionFailedException {
+    this.accountsRepository.transfer(transaction);
   }
 
 }

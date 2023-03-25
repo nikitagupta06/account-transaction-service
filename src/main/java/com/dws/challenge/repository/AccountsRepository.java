@@ -1,18 +1,18 @@
 package com.dws.challenge.repository;
 
 import com.dws.challenge.domain.Account;
+import com.dws.challenge.domain.Transaction;
 import com.dws.challenge.exception.DuplicateAccountIdException;
 import com.dws.challenge.exception.TransactionFailedException;
 
-import java.math.BigDecimal;
-
 public interface AccountsRepository {
 
-  void createAccount(Account account) throws DuplicateAccountIdException;
+    void createAccount(Account account) throws DuplicateAccountIdException;
 
-  Account getAccount(String accountId);
+    Account getAccount(String accountId);
 
-  void clearAccounts();
+    void clearAccounts();
 
-  void transfer(String accountFrom, String accountTo, BigDecimal amount) throws TransactionFailedException;
+    void transfer(Transaction transaction) throws TransactionFailedException;
+
 }

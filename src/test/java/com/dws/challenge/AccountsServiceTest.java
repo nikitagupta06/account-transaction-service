@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.math.BigDecimal;
 
 import com.dws.challenge.domain.Account;
+import com.dws.challenge.domain.Transaction;
 import com.dws.challenge.exception.DuplicateAccountIdException;
 import com.dws.challenge.exception.TransactionFailedException;
 import com.dws.challenge.service.AccountsService;
@@ -44,36 +45,33 @@ class AccountsServiceTest {
       assertThat(ex.getMessage()).isEqualTo("Account id " + uniqueId + " already exists!");
     }
   }
-
   @Test
   void TransactionFailed_negativeAmount() {
-    Account fromAccount = new Account("123");
-    fromAccount.setBalance(new BigDecimal(1000));
-    Account toAccount = new Account("124");
-    fromAccount.setBalance(new BigDecimal(1500));
-    BigDecimal amount = new BigDecimal("-100");
-
+    Account accountOne = new Account("123");
+    accountOne.setBalance(new BigDecimal(1000));
+    Account accountTwo = new Account("124");
+    accountTwo.setBalance(new BigDecimal(1500));
+    Transaction transaction = new Transaction(accountOne.getAccountId(), accountTwo.getAccountId(),
+            new BigDecimal("-10"));
     try {
-      this.accountsService.transfer(fromAccount.getAccountId(), toAccount.getAccountId(), amount);
+      this.accountsService.transfer(transaction);
     } catch (TransactionFailedException ex) {
       assertThat(ex.getMessage()).isEqualTo("Amount can not be negative!");
     }
-
   }
   @Test
   void transactionFailedException_insufficientBalance() {
-    Account fromAccount = new Account("123");
-    fromAccount.setBalance(new BigDecimal(1000));
-    Account toAccount = new Account("124");
-    fromAccount.setBalance(new BigDecimal(1500));
-    BigDecimal amount = new BigDecimal("1001");
-
+    Account accountOne = new Account("123");
+    accountOne.setBalance(new BigDecimal(1000));
+    Account accountTwo = new Account("124");
+    accountTwo.setBalance(new BigDecimal(1500));
+    Transaction transaction = new Transaction(accountOne.getAccountId(), accountTwo.getAccountId(),
+            new BigDecimal("1001"));
     try {
-      this.accountsService.transfer(fromAccount.getAccountId(), toAccount.getAccountId(), amount);
+      this.accountsService.transfer(transaction);
     } catch (TransactionFailedException ex) {
-      assertThat(ex.getMessage()).isEqualTo("Account id " + fromAccount.getAccountId() +
-              " has low Balance");
+      assertThat(ex.getMessage()).isEqualTo("Account id 123 has low Balance");
     }
-
   }
+
 }

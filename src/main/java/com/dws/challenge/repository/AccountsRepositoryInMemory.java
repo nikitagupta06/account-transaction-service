@@ -1,6 +1,7 @@
 package com.dws.challenge.repository;
 
 import com.dws.challenge.domain.Account;
+import com.dws.challenge.domain.Transaction;
 import com.dws.challenge.exception.DuplicateAccountIdException;
 import com.dws.challenge.exception.TransactionFailedException;
 import com.dws.challenge.service.EmailNotificationService;
@@ -15,7 +16,7 @@ public class AccountsRepositoryInMemory implements AccountsRepository {
 
     private final Map<String, Account> accounts = new ConcurrentHashMap<>();
 
-    private EmailNotificationService emailNotificationService;
+    private final EmailNotificationService emailNotificationService;
 
     public AccountsRepositoryInMemory(EmailNotificationService emailNotificationService) {
         this.emailNotificationService = emailNotificationService;
@@ -25,8 +26,7 @@ public class AccountsRepositoryInMemory implements AccountsRepository {
     public void createAccount(Account account) throws DuplicateAccountIdException {
         Account previousAccount = accounts.putIfAbsent(account.getAccountId(), account);
         if (previousAccount != null) {
-            throw new DuplicateAccountIdException(
-                    "Account id " + account.getAccountId() + " already exists!");
+            throw new DuplicateAccountIdException("Account id " + account.getAccountId() + " already exists!");
         }
     }
 
@@ -41,31 +41,28 @@ public class AccountsRepositoryInMemory implements AccountsRepository {
     }
 
     @Override
-    public void transfer(String accountIdFrom, String accountIdTo, BigDecimal amount)
-            throws TransactionFailedException {
+    public void transfer(Transaction transaction) throws TransactionFailedException {
+
+        String fromAccountId = transaction.getFromAccountId();
+        String toAccountId = transaction.getToAccountId();
+        BigDecimal amount = transaction.getAmount();
 
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new TransactionFailedException("Amount can not be negative!");
         }
-        Account fromAccount = accounts.get(accountIdFrom);
-        Account toAccount = accounts.get(accountIdTo);
 
-        if (amount.compareTo(fromAccount.getBalance()) == 1) {
-            throw new TransactionFailedException("Account id " + accountIdFrom +
-                    " has low Balance");
+        if (amount.compareTo(accounts.get(fromAccountId).getBalance()) == 1) {
+            throw new TransactionFailedException("Account id " + fromAccountId + " has low Balance");
         }
 
-        fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
-        toAccount.setBalance(toAccount.getBalance().add(amount));
+        new Thread(() -> {
+            accounts.get(fromAccountId).setBalance(accounts.get(fromAccountId).getBalance().subtract(amount));
+            accounts.get(toAccountId).setBalance(accounts.get(toAccountId).getBalance().add(amount));
 
-        String fromAccountNotification =  "Sent " + amount + " to account ID : " + accountIdTo;
-        String toAccountNotification = "Received " + amount + " from account ID : " + accountIdFrom;
-
-        emailNotificationService.notifyAboutTransfer(fromAccount, fromAccountNotification);
-        emailNotificationService.notifyAboutTransfer(toAccount, toAccountNotification);
-
+            emailNotificationService.notifyAboutTransfer(accounts.get(fromAccountId), "Sent " + amount + " to account ID : " + toAccountId);
+            emailNotificationService.notifyAboutTransfer(accounts.get(toAccountId), "Received " + amount + " from account ID : " + fromAccountId);
+        }).start();
     }
-
 
 
 }

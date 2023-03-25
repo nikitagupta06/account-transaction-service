@@ -49,7 +49,7 @@ public class AccountsController {
   public ResponseEntity<Object> transfer(@RequestBody Transaction transaction) {
 
     try {
-      this.accountsService.transfer(transaction.getFromAccountId(), transaction.getFromAccountId(), transaction.getAmount());
+      this.accountsService.transfer(transaction);
     } catch (TransactionFailedException transactionFailedException) {
       return new ResponseEntity<>(transactionFailedException.getMessage(), HttpStatus.BAD_REQUEST);
     }

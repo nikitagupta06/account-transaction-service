@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 import java.math.BigDecimal;
 
 import com.dws.challenge.domain.Account;
+import com.dws.challenge.domain.Transaction;
 import com.dws.challenge.service.AccountsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -104,13 +105,15 @@ class AccountsControllerTest {
   }
 
   @Test
-  void transfer() throws Exception {
+  void transactionSuccessful() throws Exception {
     Account fromAccount = new Account("123", new BigDecimal("1200"));
     this.accountsService.createAccount(fromAccount);
     Account toAccount = new Account("124", new BigDecimal("1500"));
     this.accountsService.createAccount(toAccount);
 
-    this.accountsService.transfer(fromAccount.getAccountId(), toAccount.getAccountId(), new BigDecimal(100));
+    Transaction transaction = new Transaction("123", "124", new BigDecimal(100));
+
+    this.accountsService.transfer(transaction);
     this.mockMvc.perform(post("/v1/accounts/transfer").contentType(MediaType.APPLICATION_JSON)
             .content("{\"fromAccountId\":\"123\",\"toAccountId\":\"124\",\"amount\":\"100\"}")).andExpect(status().isAccepted());
   }
